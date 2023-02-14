@@ -2,7 +2,7 @@ package com.worldcupscoreboard.model;
 
 import java.time.LocalDateTime;
 
-public class Game implements Runnable{
+public class Game implements Runnable {
 
     private final String idGame;
     private final LocalDateTime dayOfGame;

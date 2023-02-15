@@ -1,6 +1,9 @@
 package com.worldcupscoreboard.model;
 
+import com.worldcupscoreboard.svc.InputOutPutSvc;
+
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -9,6 +12,7 @@ public class ScoreBoard {
 
     private final LocalDateTime localDateTime;
     private final Map<Long, Game> ongoingGames;
+    private static final InputOutPutSvc INPUT_OUT_PUT_SVC = new InputOutPutSvc();
     private static final Scanner inputScanner = new Scanner(System.in);
 
 
@@ -71,5 +75,47 @@ public class ScoreBoard {
     }
 
     private void startNewGame() {
+        System.out.println("Type local team:");
+        Team localTeam = validateInputTeam();
+
+        System.out.println("Type visitor team:");
+        Team visitorTeam = validateInputTeam();
+
+        LocalDateTime playDateTime = LocalDateTime.now();
+        Game newGame = new Game(playDateTime, localTeam, visitorTeam);
+        Thread thread = new Thread(newGame);
+        thread.start();
+
+        System.out.println("New game started: "
+                + newGame.getLocalTeam().getCountry()
+                + " VS "
+                + newGame.getVisitorTeam().getCountry());
+
+        ongoingGames.put(Long.valueOf(newGame.getIdGame()), newGame);
+        INPUT_OUT_PUT_SVC.pressEnterContinue();
+
     }
+
+    public Team validateInputTeam() {
+        boolean invalidInput = true;
+        do {
+            String team = inputScanner.next();
+            String inCountry = team.toUpperCase();
+
+            if (Arrays.stream(Country.values()).anyMatch(country -> country.name().equals(inCountry))) {
+                Team newTeam = new Team(Country.valueOf(inCountry));
+                // check if this Team is already playing a game
+                if (ongoingGames.values().stream().noneMatch(game -> game.getLocalTeam().equals(newTeam) || game.getVisitorTeam().equals(newTeam))) {
+                    invalidInput = false;
+                    return newTeam;
+                }
+                System.out.println("The selected country is already playing a game. Pick another one:");
+            } else {
+                System.out.println("Pick a correct country. Pick a classified country to the last 2022 World Cup:");
+            }
+
+        } while (invalidInput);
+        return null;
+    }
+
 }

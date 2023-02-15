@@ -14,4 +14,9 @@ class ScoreBoardTest {
     @Test
     void initScoreBoard() {
     }
+
+    private void provideInput(String input) {
+
+
+    }
 }

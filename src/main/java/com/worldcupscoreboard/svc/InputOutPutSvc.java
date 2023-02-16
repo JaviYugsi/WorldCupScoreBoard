@@ -1,6 +1,9 @@
 package com.worldcupscoreboard.svc;
 
+import com.worldcupscoreboard.model.Country;
+
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class InputOutPutSvc {
@@ -28,7 +31,7 @@ public class InputOutPutSvc {
             inputScanner = new Scanner(System.in);
             String res = inputScanner.next().trim();
             if (res.length() > 1)
-                return null;
+                return "";
             return res;
         }
 
@@ -57,6 +60,20 @@ public class InputOutPutSvc {
             if (input.length() > 10)
                 return null;
             return input;
+        }
+
+    /**
+     * This method validates that the input Country name matches with one of the classified countries to the last
+     * FIFA World Cup 2022
+     * @return
+     */
+    public String validateInputTeam () {
+            inputScanner = new Scanner(System.in);
+            String input = inputScanner.next().toUpperCase();
+            if (Arrays.stream(Country.values()).anyMatch(country -> country.name().equals(input)))
+                return input;
+
+            return null;
         }
 
 }

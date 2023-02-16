@@ -43,8 +43,6 @@ class InputOutPutSvcTest {
     }
 
     private void provideConsoleInput(String input) {
-        InputOutPutSvc test = new InputOutPutSvc();
-        InputStream sysInBackUp = System.in;
         ByteArrayInputStream consoleInput = new ByteArrayInputStream(input.getBytes());
         System.setIn(consoleInput);
 
@@ -63,7 +61,7 @@ class InputOutPutSvcTest {
         String valid = "33";
         provideConsoleInput(valid);
         String res = inputOutPutSvc.enterValidStringOption();
-        assertEquals(null, res);
+        assertEquals("", res);
     }
 
     @Test
@@ -80,5 +78,30 @@ class InputOutPutSvcTest {
         provideConsoleInput(inValid);
         String res = inputOutPutSvc.enterValidGameId();
         assertEquals(null, res);
+    }
+
+    @Test
+    void validateInputTeamGoodReq() {
+        String inValid = "asdasdqweqwwq";
+        provideConsoleInput(inValid);
+        String res = inputOutPutSvc.validateInputTeam();
+        assertEquals(null, res);
+    }
+
+    @Test
+    void validateInputTeamBadReqUpper() {
+        String valid = "MEXICO";
+        provideConsoleInput(valid);
+        String res = inputOutPutSvc.validateInputTeam();
+        assertEquals(valid, res);
+    }
+
+
+    @Test
+    void validateInputTeamBadReqLower() {
+        String valid = "spain";
+        provideConsoleInput(valid);
+        String res = inputOutPutSvc.validateInputTeam();
+        assertEquals("SPAIN", res);
     }
 }

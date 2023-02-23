@@ -14,7 +14,7 @@ classified to the last FIFA World Cup.
 - At the main menu, the user only can type values between 0 - 5. These are the options shown at the menu
 - Each game has its own Id, it is used to identify the game and update it when needed.
 - For each case the user will be prompted to use the console input.
-- The application will be running indefinitely until the used decides to stop it
+- The application will be running indefinitely until the user decides to stop it
 - If the user does not provide a valid country, the program will keep asking for one until one is provided
 - In order to sort the games, one specific field has been added to the Game Object; gameTimeField.
 This is used to sort the games when the total of goals scored at one game are equal between different games.

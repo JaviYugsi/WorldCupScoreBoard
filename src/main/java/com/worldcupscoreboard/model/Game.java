@@ -87,34 +87,4 @@ public class Game implements Runnable {
         this.totalGameScore = this.localTeamScore + this.visitorTeamScore;
     }
 
-
-    public void updateVisitorTeamScore() {
-        boolean validScore = false;
-        do {
-            System.out.println("Enter new score for Visitor Team, " + this.getVisitorTeam().getCountry() + ":");
-            String visitorNewScore = ScoreBoard.INPUT_OUT_PUT_SVC.enterValidScore();
-            try {
-                Integer intVisitorNewScore = Integer.valueOf(visitorNewScore);
-                validScore = true;
-                this.setVisitorTeamScore(intVisitorNewScore);
-            } catch (NumberFormatException e) {
-                System.out.println("Not a valid number try again.");
-            }
-        } while (!validScore);
-    }
-
-    public void updateLocalTeamScore() {
-        boolean validScore = false;
-        do {
-            System.out.println("Enter new score for Local Team, " + this.getLocalTeam().getCountry() + ":");
-            String localNewScore = ScoreBoard.INPUT_OUT_PUT_SVC.enterValidScore();
-            try {
-                Integer intLocalNewScore = Integer.valueOf(localNewScore);
-                validScore = true;
-                this.setLocalTeamScore(intLocalNewScore);
-            } catch (NumberFormatException e) {
-                System.out.println("Not a valid number try again.");
-            }
-        } while (!validScore);
-    }
 }

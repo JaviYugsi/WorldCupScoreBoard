@@ -1,6 +1,8 @@
 package com.worldcupscoreboard.model;
 
+import com.worldcupscoreboard.svc.GameSvc;
 import com.worldcupscoreboard.svc.InputOutPutSvc;
+import com.worldcupscoreboard.svc.TeamSvc;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -9,12 +11,23 @@ import java.util.stream.Collectors;
 public class ScoreBoard {
 
     private final LocalDateTime localDateTime;
-    private final Map<Long, Game> ongoingGames;
+    public static final Map<Long, Game> ongoingGames = new LinkedHashMap<>();
     public static final InputOutPutSvc INPUT_OUT_PUT_SVC = new InputOutPutSvc();
+    private TeamSvc teamSvc;
+    private GameSvc gameSvc;
 
     public ScoreBoard(LocalDateTime localDateTime) {
         this.localDateTime = localDateTime;
-        this.ongoingGames = new LinkedHashMap<>();
+        teamSvc = new TeamSvc();
+        gameSvc = new GameSvc();
+    }
+
+    public TeamSvc getTeamSvc() {
+        return teamSvc;
+    }
+
+    public GameSvc getGameSvc() {
+        return gameSvc;
     }
 
     /**
@@ -92,7 +105,7 @@ public class ScoreBoard {
             Thread.sleep(1500);
             return;
         }
-        Game gameToFinish = pickOngoingGame();
+        Game gameToFinish = gameSvc.pickOngoingGame();
         //The possible exception has already dealed in the pickOngoingGame method
         ongoingGames.remove(Long.valueOf(gameToFinish.getIdGame()));
         System.out.println("Game removed successfully. New Score board:");
@@ -106,9 +119,9 @@ public class ScoreBoard {
             Thread.sleep(1500);
             return;
         }
-        Game gameToUpdate = pickOngoingGame();
-        gameToUpdate.updateLocalTeamScore();
-        gameToUpdate.updateVisitorTeamScore();
+        Game gameToUpdate = gameSvc.pickOngoingGame();
+        gameSvc.updateLocalTeamScore(gameToUpdate);
+        gameSvc.updateVisitorTeamScore(gameToUpdate);
         System.out.println("Game updated successfully. New Score board:");
         printGamesMap(ongoingGames.values());
         INPUT_OUT_PUT_SVC.pressEnterContinue();
@@ -120,9 +133,9 @@ public class ScoreBoard {
      */
     private void startNewGame() {
         System.out.println("Type local team and press enter:");
-        Team localTeam = enterValidTeam();
+        Team localTeam = teamSvc.enterValidTeam();
         System.out.println("Type visitor team and press enter:");
-        Team visitorTeam = enterValidTeam();
+        Team visitorTeam = teamSvc.enterValidTeam();
 
         LocalDateTime playDateTime = LocalDateTime.now();
         Game newGame = new Game(playDateTime, localTeam, visitorTeam);
@@ -139,58 +152,7 @@ public class ScoreBoard {
         INPUT_OUT_PUT_SVC.pressEnterContinue();
     }
 
-    public Team enterValidTeam() {
-        boolean invalidInput = true;
-        do {
-            String teamCountry = INPUT_OUT_PUT_SVC.validateInputTeam();
-            if (teamCountry != null) {
-                Team newTeam = new Team(Country.valueOf(teamCountry));
-                // check if this Team is already playing a game
-                if (ongoingGames.size() == 0
-                        || (ongoingGames.values().stream()
-                            .noneMatch(game -> game.getLocalTeam().equals(newTeam)
-                                        || game.getVisitorTeam().equals(newTeam)))) {
-                    invalidInput = false;
-                    return newTeam;
-                }
-                System.out.println("The selected country is already playing a game. Pick another one:");
-            } else {
-                System.out.println("Pick a correct country. Pick a classified country to the last 2022 World Cup:");
-            }
-        } while (invalidInput);
-        return null;
-    }
-
-    /**
-     * The user is requested to enter a GameId from the ScoreBoard.
-     * If the GameId is correct a Game object is returned, otherwise the process will be repeated.
-     * @return
-     */
-    public Game pickOngoingGame() {
-        printGamesMap(ongoingGames.values());
-        boolean validIdGame = false;
-        do {
-            System.out.println("Pick one Game using its Game Id:");
-            String idGame = INPUT_OUT_PUT_SVC.enterValidGameId();
-            try {
-                Long intIdGame = Long.valueOf(idGame);
-                validIdGame = ongoingGames.containsKey(intIdGame);
-                if(validIdGame) {
-                    return ongoingGames.get(intIdGame);
-                } else {
-                    printGamesMap(ongoingGames.values());
-                    System.out.println("Invalid Game Id, select another one.");
-                }
-            } catch (NumberFormatException e) {
-                printGamesMap(ongoingGames.values());
-                System.out.println("Invalid Game Id, select another one.");
-            }
-        } while(!validIdGame);
-        return null;
-    }
-
-
-    private void printGamesMap(Collection<Game> ongoingGames) {
+    public static void printGamesMap(Collection<Game> ongoingGames) {
         System.out.println("========================== SCORE BOARD ==========================");
         System.out.format("%15s%15s%15s%10s%10s%n", "GAME ID", "LOCAL TEAM", "VISITOR TEAM", "L. SCORE", "V. SCORE");
         ongoingGames.forEach(game -> {
